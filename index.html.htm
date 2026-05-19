@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Research Network – Prof. Dr. Melanie Broszat</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;600&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0b1220; color: #e2e8f0;
+    font-family: 'Source Sans 3', sans-serif;
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; padding: 24px 16px 40px;
+  }
+  header { text-align: center; margin-bottom: 8px; max-width: 700px; }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.3rem, 3vw, 2rem);
+    font-weight: 900; letter-spacing: -0.5px; color: #f1f5f9; line-height: 1.15;
+  }
+  header p { font-size: 0.80rem; color: #64748b; margin-top: 4px; font-weight: 300; }
+  #network-wrap { width: 100%; max-width: 1020px; margin: 0 auto; }
+  svg { width: 100%; height: auto; overflow: visible; }
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 8px 18px;
+    justify-content: center; margin-top: 14px; font-size: 0.74rem; color: #94a3b8;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  #tooltip {
+    position: fixed; background: #1e293b; border: 1px solid #334155;
+    border-radius: 10px; padding: 9px 13px; max-width: 250px;
+    font-size: 0.76rem; color: #cbd5e1; pointer-events: none;
+    opacity: 0; transition: opacity 0.15s; z-index: 99;
+    line-height: 1.5; white-space: pre-line;
+  }
+  #tooltip strong { color: #f1f5f9; font-size: 0.80rem; display: block; margin-bottom: 3px; }
+  .node-group { cursor: pointer; }
+  .node-group:hover .node-circle { filter: brightness(1.3); }
+  footer { margin-top: 20px; font-size: 0.68rem; color: #475569; text-align: center; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Research Network</h1>
+  <p>Prof. Dr. Melanie Broszat · Hochschule Offenburg · Institute for Circular Bioeconomy (ICB)</p>
+</header>
+
+<div id="network-wrap">
+<svg viewBox="0 0 960 820" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="glow-center" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow1" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-sm" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0L0 0 0 40" fill="none" stroke="rgba(148,163,184,0.04)" stroke-width="0.5"/>
+    </pattern>
+  </defs>
+
+  <rect width="960" height="820" fill="#0b1220"/>
+  <rect width="960" height="820" fill="url(#grid)"/>
+
+  <!--
+    LAYOUT (center 480,390):
+    C1 blue   top-center:   480, 155
+    C6 pink   top-left:     210, 210
+    C2 green  top-right:    750, 210
+    C4 purple bottom-left:  210, 570
+    C5 yellow bottom-center:480, 620
+    C3 orange bottom-right: 750, 570
+  -->
+
+  <!-- CENTER → CLUSTER SPOKES -->
+  <line x1="480" y1="390" x2="480" y2="155" stroke="#38bdf8" stroke-width="1.6" stroke-opacity="0.38"/>
+  <line x1="480" y1="390" x2="210" y2="210" stroke="#f472b6" stroke-width="1.6" stroke-opacity="0.38"/>
+  <line x1="480" y1="390" x2="750" y2="210" stroke="#4ade80" stroke-width="1.6" stroke-opacity="0.38"/>
+  <line x1="480" y1="390" x2="210" y2="570" stroke="#e879f9" stroke-width="1.6" stroke-opacity="0.38"/>
+  <line x1="480" y1="390" x2="480" y2="620" stroke="#facc15" stroke-width="1.6" stroke-opacity="0.38"/>
+  <line x1="480" y1="390" x2="750" y2="570" stroke="#fb923c" stroke-width="1.6" stroke-opacity="0.38"/>
+
+  <!-- cross-cluster dashed -->
+  <line x1="480" y1="155" x2="210" y2="210" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="480" y1="155" x2="750" y2="210" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="210" y1="210" x2="210" y2="570" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="750" y1="210" x2="750" y2="570" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="210" y1="570" x2="480" y2="620" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="750" y1="570" x2="480" y2="620" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="5,5"/>
+
+  <!-- C1 LEAF SPOKES — 5 leaves (LC+IC combined, IR moved into former IC spot) -->
+  <line x1="480" y1="155" x2="310" y2="42" stroke="#38bdf8" stroke-width="1" stroke-opacity="0.28"/>
+  <line x1="480" y1="155" x2="392" y2="28" stroke="#38bdf8" stroke-width="1" stroke-opacity="0.28"/>
+  <line x1="480" y1="155" x2="488" y2="22" stroke="#38bdf8" stroke-width="1" stroke-opacity="0.28"/>
+  <line x1="480" y1="155" x2="568" y2="35" stroke="#38bdf8" stroke-width="1" stroke-opacity="0.28"/>
+  <line x1="480" y1="155" x2="295" y2="108" stroke="#38bdf8" stroke-width="1" stroke-opacity="0.28"/>
+
+  <!-- C6 LEAF SPOKES — top-left cluster (210,210), leaves spread left/above -->
+  <line x1="210" y1="210" x2="65"  y2="130" stroke="#f472b6" stroke-width="1" stroke-opacity="0.28"/>
+  <line x1="210" y1="210" x2="118" y2="62"  stroke="#f472b6" stroke-width="1" stroke-opacity="0.28"/>
+  <line x1="210" y1="210" x2="48"  y2="218" stroke="#f472b6" stroke-width="1" stroke-opacity="0.28"/>
+  <line x1="210" y1="210" x2="65"  y2="298" stroke="#f472b6" stroke-width="1" stroke-opacity="0.28"/>
+
+  <!-- C2 LEAF SPOKES — top-right cluster (750,210), leaves spread right/above -->
+  <line x1="750" y1="210" x2="672" y2="118"  stroke="#4ade80" stroke-width="1" stroke-opacity="0.28"/>
+  <line x1="750" y1="210" x2="715" y2="62"  stroke="#4ade80" stroke-width="1" stroke-opacity="0.28"/>
+  <line x1="750" y1="210" x2="842" y2="78"  stroke="#4ade80" stroke-width="1" stroke-opacity="0.28"/>
+  <line x1="750" y1="210" x2="888" y2="185" stroke="#4ade80" stroke-width="1" stroke-opacity="0.28"/>
+  <line x1="750" y1="210" x2="875" y2="292" stroke="#4ade80" stroke-width="1" stroke-opacity="0.28"/>
+
+  <!-- C4 LEAF SPOKES — bottom-left cluster (210,570), leaves spread left/below -->
+  <line x1="210" y1="570" x2="55"  y2="532" stroke="#e879f9" stroke-width="1" stroke-opacity="0.28"/>
+  <line x1="210" y1="570" x2="62"  y2="628" stroke="#e879f9" stroke-width="1" stroke-opacity="0.28"/>
+  <line x1="210" y1="570" x2="118" y2="478" stroke="#e879f9" stroke-width="1" stroke-opacity="0.28"/>
+  <!-- C5 LEAF SPOKES — bottom-center cluster (480,620) -->
+  <line x1="480" y1="620" x2="335" y2="710" stroke="#facc15" stroke-width="1" stroke-opacity="0.28"/>
+  <line x1="480" y1="620" x2="480" y2="732" stroke="#facc15" stroke-width="1" stroke-opacity="0.28"/>
+  <line x1="480" y1="620" x2="625" y2="710" stroke="#facc15" stroke-width="1" stroke-opacity="0.28"/>
+  <line x1="480" y1="620" x2="648" y2="630" stroke="#facc15" stroke-width="1" stroke-opacity="0.28"/>
+
+  <!-- C3 LEAF SPOKES — bottom-right cluster (750,570), leaves spread right/below -->
+  <line x1="750" y1="570" x2="888" y2="492" stroke="#fb923c" stroke-width="1" stroke-opacity="0.28"/>
+  <line x1="750" y1="570" x2="905" y2="572" stroke="#fb923c" stroke-width="1" stroke-opacity="0.28"/>
+  <line x1="750" y1="570" x2="858" y2="665" stroke="#fb923c" stroke-width="1" stroke-opacity="0.28"/>
+  <line x1="750" y1="570" x2="722" y2="672" stroke="#fb923c" stroke-width="1" stroke-opacity="0.28"/>
+
+  <!-- ══════════════ CENTER NODE ══════════════ -->
+  <g class="node-group" data-tip="center">
+    <circle cx="480" cy="390" r="75" fill="#1e293b" stroke="#94a3b8" stroke-width="2" filter="url(#glow-center)" class="node-circle"/>
+    <circle cx="480" cy="390" r="67" fill="#0f172a" stroke="#475569" stroke-width="1"/>
+    <!-- Ascending bar chart, heights reduced another ~5%: 19,26,32,40,32,40 -->
+    <rect x="428" y="366" width="14" height="19" rx="2" fill="#ff6eb4" opacity="0.9"/>
+    <rect x="446" y="359" width="14" height="26" rx="2" fill="#4ade80" opacity="0.9"/>
+    <rect x="464" y="353" width="14" height="32" rx="2" fill="#38bdf8" opacity="0.9"/>
+    <rect x="482" y="345" width="14" height="40" rx="2" fill="#fb923c" opacity="0.9"/>
+    <rect x="500" y="353" width="14" height="32" rx="2" fill="#e879f9" opacity="0.9"/>
+    <rect x="518" y="345" width="14" height="40" rx="2" fill="#facc15" opacity="0.9"/>
+    <!-- baseline -->
+    <line x1="424" y1="385" x2="536" y2="385" stroke="#475569" stroke-width="1"/>
+    <text x="480" y="404" text-anchor="middle" font-family="'Playfair Display',serif" font-size="10" font-weight="700" fill="#cbd5e1">Analytics &amp;</text>
+    <text x="480" y="419" text-anchor="middle" font-family="'Playfair Display',serif" font-size="10" font-weight="700" fill="#cbd5e1">Circular Bioeconomy</text>
+  </g>
+
+  <!-- ══════════════ CLUSTER NODES ══════════════ -->
+
+  <!-- C1: blue, top-center (480,155) -->
+  <g class="node-group" data-tip="c1">
+    <circle cx="480" cy="155" r="47" fill="#0c2340" stroke="#38bdf8" stroke-width="2.2" filter="url(#glow1)" class="node-circle"/>
+    <text x="480" y="144" text-anchor="middle" font-size="19" fill="#38bdf8">⚗</text>
+    <text x="480" y="159" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="8.5" font-weight="600" fill="#bae6fd">Chromatography</text>
+    <text x="480" y="170" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="8.5" font-weight="600" fill="#bae6fd">&amp; Instrumental</text>
+    <text x="480" y="181" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="8.5" font-weight="600" fill="#bae6fd">Analytics</text>
+    <text x="480" y="218" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="8" font-weight="700" fill="#38bdf8" letter-spacing="0.5">CHROMATOGRAPHY &amp; INSTRUMENTAL ANALYTICS</text>
+  </g>
+
+  <!-- C6: bright pink, top-left (210,210) -->
+  <g class="node-group" data-tip="c6">
+    <circle cx="210" cy="210" r="47" fill="#4a0535" stroke="#ff6eb4" stroke-width="2.2" filter="url(#glow1)" class="node-circle"/>
+    <text x="210" y="199" text-anchor="middle" font-size="19" fill="#ff6eb4">💧</text>
+    <text x="210" y="215" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="8.5" font-weight="600" fill="#ffb3d9">Nutrient</text>
+    <text x="210" y="226" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="8.5" font-weight="600" fill="#ffb3d9">Recovery</text>
+    <text x="210" y="237" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="8.5" font-weight="600" fill="#ffb3d9">N &amp; P</text>
+    <text x="210" y="274" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="8" font-weight="700" fill="#ff6eb4" letter-spacing="0.5">NUTRIENT RECOVERY</text>
+  </g>
+
+  <!-- C2: green, top-right (750,210) -->
+  <g class="node-group" data-tip="c2">
+    <circle cx="750" cy="210" r="47" fill="#052e16" stroke="#4ade80" stroke-width="2.2" filter="url(#glow1)" class="node-circle"/>
+    <text x="750" y="199" text-anchor="middle" font-size="19" fill="#4ade80">🌿</text>
+    <text x="750" y="215" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="8.5" font-weight="600" fill="#bbf7d0">Environmental</text>
+    <text x="750" y="226" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="8.5" font-weight="600" fill="#bbf7d0">Analytics &amp;</text>
+    <text x="750" y="237" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="8.5" font-weight="600" fill="#bbf7d0">Micropollutants</text>
+    <text x="750" y="274" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="8" font-weight="700" fill="#4ade80" letter-spacing="0.5">ENVIRONMENTAL ANALYTICS &amp; MICROPOLLUTANTS</text>
+  </g>
+
+  <!-- C4: darker purple, bottom-left (210,570) -->
+  <g class="node-group" data-tip="c4">
+    <circle cx="210" cy="570" r="47" fill="#1e0842" stroke="#c026d3" stroke-width="2.2" filter="url(#glow1)" class="node-circle"/>
+    <text x="210" y="562" text-anchor="middle" font-size="16" fill="#c026d3">⬡</text>
+    <text x="210" y="575" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="8.5" font-weight="600" fill="#e879f9">Ecotoxicology</text>
+    <text x="210" y="586" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="8.5" font-weight="600" fill="#e879f9">&amp; Effect-Based</text>
+    <text x="210" y="597" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="8.5" font-weight="600" fill="#e879f9">Analytics</text>
+    <text x="210" y="634" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="8" font-weight="700" fill="#c026d3" letter-spacing="0.5">ECOTOXICOLOGY &amp; EFFECT-BASED ANALYTICS</text>
+  </g>
+
+  <!-- C5: yellow, bottom-center (480,620) -->
+  <g class="node-group" data-tip="c5">
+    <circle cx="480" cy="620" r="47" fill="#1c1400" stroke="#facc15" stroke-width="2.2" filter="url(#glow1)" class="node-circle"/>
+    <!-- Data/database SVG icon, icon cx=13, scale=0.55, rendered center=13*0.55=7.15, translate x=480-7.15=472.85 -->
+    <g transform="translate(473,597) scale(0.55)">
+      <!-- cylinder base (database) -->
+      <ellipse cx="13" cy="20" rx="12" ry="4" fill="none" stroke="#facc15" stroke-width="2"/>
+      <ellipse cx="13" cy="12" rx="12" ry="4" fill="none" stroke="#facc15" stroke-width="2"/>
+      <ellipse cx="13" cy="4"  rx="12" ry="4" fill="none" stroke="#facc15" stroke-width="2"/>
+      <line x1="1"  y1="4"  x2="1"  y2="20" stroke="#facc15" stroke-width="2"/>
+      <line x1="25" y1="4"  x2="25" y2="20" stroke="#facc15" stroke-width="2"/>
+      <!-- signal/chart lines on top -->
+      <polyline points="5,1 9,-3 13,1 17,-3 21,1" fill="none" stroke="#facc15" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <text x="480" y="625" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="8.5" font-weight="600" fill="#fef08a">Chemometrics</text>
+    <text x="480" y="636" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="8.5" font-weight="600" fill="#fef08a">&amp; AI / ML</text>
+    <text x="480" y="680" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="8" font-weight="700" fill="#facc15" letter-spacing="0.5">CHEMOMETRICS &amp; AI / ML</text>
+  </g>
+
+  <!-- C3: orange, bottom-right (750,570) -->
+  <g class="node-group" data-tip="c3">
+    <circle cx="750" cy="570" r="47" fill="#431407" stroke="#fb923c" stroke-width="2.2" filter="url(#glow1)" class="node-circle"/>
+    <text x="750" y="559" text-anchor="middle" font-size="19" fill="#fb923c">♻</text>
+    <text x="750" y="575" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="8.5" font-weight="600" fill="#fed7aa">Hydrothermal</text>
+    <text x="750" y="586" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="8.5" font-weight="600" fill="#fed7aa">Carbonization &amp;</text>
+    <text x="750" y="597" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="8.5" font-weight="600" fill="#fed7aa">Circular Economy</text>
+    <text x="750" y="634" text-anchor="middle" font-family="'Source Sans 3',sans-serif" font-size="8" font-weight="700" fill="#fb923c" letter-spacing="0.5">HTC &amp; CIRCULAR ECONOMY</text>
+  </g>
+
+  <!-- ══════════════ C1 LEAF NODES — 5 leaves ══════════════ -->
+  <g class="node-group" data-tip="LC and IC (liquid chromatography) with different detectors (DAD, fluorescence, RI, amperometry, conductivity) for analysis of micropollutants, nutrients and process compounds">
+    <circle cx="310" cy="42" r="27" fill="#0c2340" stroke="#38bdf8" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="310" y="39" text-anchor="middle" font-size="8" fill="#bae6fd" font-weight="700">LC</text>
+    <text x="310" y="50" text-anchor="middle" font-size="8" fill="#bae6fd" font-weight="700">IC</text>
+  </g>
+  <g class="node-group" data-tip="GC (gas chromatography) with different detectors (FID, WLD) for (semi-)volatile organic compounds">
+    <circle cx="392" cy="28" r="27" fill="#0c2340" stroke="#38bdf8" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="392" y="32" text-anchor="middle" font-size="9" fill="#bae6fd" font-weight="700">GC</text>
+  </g>
+  <g class="node-group" data-tip="IR spectroscopy (ATR-FTIR) for structural characterization of organics (e.g. polymers)">
+    <circle cx="488" cy="22" r="27" fill="#0c2340" stroke="#38bdf8" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="488" y="26" text-anchor="middle" font-size="9" fill="#bae6fd" font-weight="700">IR</text>
+  </g>
+  <g class="node-group" data-tip="ICP-OES for elemental analysis and TOC-NPOC for total organic carbon and total nitrogen in environmental, solids, and process water samples">
+    <circle cx="568" cy="35" r="27" fill="#0c2340" stroke="#38bdf8" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="568" y="32" text-anchor="middle" font-size="7.2" fill="#bae6fd" font-weight="600">ICP-OES</text>
+    <text x="568" y="42" text-anchor="middle" font-size="7.2" fill="#bae6fd">TOC</text>
+  </g>
+  <g class="node-group" data-tip="HPTLC coupled with bioassays for effect-directed analysis (EDA, planar fractionation for toxicity testing)">
+    <circle cx="295" cy="108" r="27" fill="#0c2340" stroke="#38bdf8" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="295" y="105" text-anchor="middle" font-size="7.2" fill="#bae6fd" font-weight="600">HPTLC</text>
+    <text x="295" y="115" text-anchor="middle" font-size="7.2" fill="#bae6fd">EDA</text>
+  </g>
+
+  <!-- ══════════════ C6 LEAF NODES (top-left, spread left/above) ══════════════ -->
+  <g class="node-group" data-tip="Struvite precipitation (MgNH4PO4) for phosphorus recovery from HTC process water and anaerobic digestate">
+    <circle cx="65" cy="130" r="27" fill="#4a0535" stroke="#ff6eb4" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="65" y="127" text-anchor="middle" font-size="7.2" fill="#ffb3d9" font-weight="600">Struvite</text>
+    <text x="65" y="137" text-anchor="middle" font-size="7.2" fill="#ffb3d9">Precipitation</text>
+  </g>
+  <g class="node-group" data-tip="Nitrogen recovery from process water">
+    <circle cx="118" cy="62" r="27" fill="#4a0535" stroke="#ff6eb4" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="118" y="59" text-anchor="middle" font-size="7.2" fill="#ffb3d9" font-weight="600">N Recovery</text>
+    <text x="118" y="69" text-anchor="middle" font-size="7.2" fill="#ffb3d9">NH₄⁺</text>
+  </g>
+  <g class="node-group" data-tip="P speciation analytics in process water (coupling of IC and ICP-OES)">
+    <circle cx="48" cy="218" r="27" fill="#4a0535" stroke="#ff6eb4" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="48" y="222" text-anchor="middle" font-size="7.2" fill="#ffb3d9" font-weight="600">P Speciation</text>
+  </g>
+  <g class="node-group" data-tip="Wastewater treatment and nutrient flux monitoring">
+    <circle cx="65" cy="298" r="27" fill="#4a0535" stroke="#ff6eb4" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="65" y="295" text-anchor="middle" font-size="7.2" fill="#ffb3d9" font-weight="600">Wastewater</text>
+    <text x="65" y="305" text-anchor="middle" font-size="7.2" fill="#ffb3d9">Treatment</text>
+  </g>
+
+  <!-- ══════════════ C2 LEAF NODES (top-right, spread right/above) ══════════════ -->
+  <g class="node-group" data-tip="Removal of pollutants from water by different techniques (adsorption, oxidation, membranes, biodegradation, …)">
+    <circle cx="672" cy="118" r="27" fill="#052e16" stroke="#4ade80" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="672" y="115" text-anchor="middle" font-size="7.2" fill="#bbf7d0" font-weight="600">Removal of</text>
+    <text x="672" y="125" text-anchor="middle" font-size="7.2" fill="#bbf7d0">Pollutants</text>
+  </g>
+  <g class="node-group" data-tip="Phosphonate analytics in water, railway ballast and environmental matrices">
+    <circle cx="715" cy="62" r="27" fill="#052e16" stroke="#4ade80" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="715" y="66" text-anchor="middle" font-size="7.2" fill="#bbf7d0" font-weight="600">Phosphonates</text>
+  </g>
+  <g class="node-group" data-tip="PFAS and TFA analytics (under development)">
+    <circle cx="842" cy="78" r="27" fill="#052e16" stroke="#4ade80" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="842" y="82" text-anchor="middle" font-size="7.2" fill="#bbf7d0" font-weight="600">PFAS, TFA</text>
+  </g>
+  <g class="node-group" data-tip="Xenobiotics: pharmaceuticals, endocrine disruptors and emerging organic micropollutants in water, biogenic waste, and HTC process streams">
+    <circle cx="888" cy="185" r="27" fill="#052e16" stroke="#4ade80" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="888" y="189" text-anchor="middle" font-size="7.2" fill="#bbf7d0" font-weight="600">Xenobiotics</text>
+  </g>
+  <g class="node-group" data-tip="Antimicrobials and antibiotic resistance genes (ARGs) in water, soil and HTC process matrices">
+    <circle cx="875" cy="292" r="27" fill="#052e16" stroke="#4ade80" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="875" y="289" text-anchor="middle" font-size="7.2" fill="#bbf7d0" font-weight="600">Antimicrobials</text>
+    <text x="875" y="299" text-anchor="middle" font-size="7.2" fill="#bbf7d0">&amp; ARGs</text>
+  </g>
+
+  <!-- ══════════════ C4 LEAF NODES (bottom-left, spread left/below) ══════════════ -->
+  <g class="node-group" data-tip="Yeast-based bioassays (YES, YAS) and bacterial tests (Aliivibrio fischeri, Bacillus subtilis, Salmonella typhimurium) for genotoxicity and cytotoxicity screening, and to screen for endocrine disruptors">
+    <circle cx="55" cy="532" r="27" fill="#1e0842" stroke="#c026d3" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="55" y="529" text-anchor="middle" font-size="7.2" fill="#e879f9" font-weight="600">Yeast and</text>
+    <text x="55" y="539" text-anchor="middle" font-size="7.2" fill="#e879f9">Bacteria</text>
+  </g>
+  <g class="node-group" data-tip="Enzyme-based bioassays: e.g. AChE inhibition (neurotoxicity), enzymatic activity screening in environmental and process water samples">
+    <circle cx="62" cy="628" r="27" fill="#1e0842" stroke="#c026d3" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="62" y="632" text-anchor="middle" font-size="9" fill="#e879f9" font-weight="700">Enzymes</text>
+  </g>
+  <g class="node-group" data-tip="Cell culture-based bioassays: e.g. endocrine disruptors">
+    <circle cx="118" cy="478" r="27" fill="#1e0842" stroke="#c026d3" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="118" y="482" text-anchor="middle" font-size="8" fill="#e879f9" font-weight="600">Cell Culture</text>
+  </g>
+
+  <!-- ══════════════ C5 LEAF NODES (bottom-center) ══════════════ -->
+  <g class="node-group" data-tip="Multivariate statistics: PCA, PLS-DA, OPLS-DA — pattern recognition, classification, source identification">
+    <circle cx="335" cy="710" r="27" fill="#1c1400" stroke="#facc15" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="335" y="707" text-anchor="middle" font-size="7.2" fill="#fef08a" font-weight="600">PCA / PLS-DA</text>
+    <text x="335" y="717" text-anchor="middle" font-size="7.2" fill="#fef08a">OPLS-DA</text>
+  </g>
+  <g class="node-group" data-tip="Machine learning and classification models for analytical data — collaboration with Prof. Lapierre (AI/ML) and A. Wagner (bioinformatics)">
+    <circle cx="480" cy="732" r="27" fill="#1c1400" stroke="#facc15" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="480" y="729" text-anchor="middle" font-size="7.2" fill="#fef08a" font-weight="600">Machine</text>
+    <text x="480" y="739" text-anchor="middle" font-size="7.2" fill="#fef08a">Learning</text>
+  </g>
+  <g class="node-group" data-tip="Predictive database development and biomarker identification — AI-assisted discovery of enzyme functions and metabolic pathways">
+    <circle cx="625" cy="710" r="27" fill="#1c1400" stroke="#facc15" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="625" y="707" text-anchor="middle" font-size="7.2" fill="#fef08a" font-weight="600">Database</text>
+    <text x="625" y="717" text-anchor="middle" font-size="7.2" fill="#fef08a">Biomarker</text>
+  </g>
+  <g class="node-group" data-tip="Spectral fingerprinting, pattern recognition, and PCR-based microbial community analysis (16S rRNA amplicon sequencing, qPCR)">
+    <circle cx="648" cy="630" r="27" fill="#1c1400" stroke="#facc15" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="648" y="627" text-anchor="middle" font-size="7.2" fill="#fef08a" font-weight="600">Fingerprinting</text>
+    <text x="648" y="637" text-anchor="middle" font-size="7.2" fill="#fef08a">&amp; Sequencing</text>
+  </g>
+
+  <!-- ══════════════ C3 LEAF NODES (bottom-right, spread right/below) ══════════════ -->
+  <g class="node-group" data-tip="Activated carbon production from hydrochar">
+    <circle cx="888" cy="492" r="27" fill="#431407" stroke="#fb923c" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="888" y="489" text-anchor="middle" font-size="7.2" fill="#fed7aa" font-weight="600">Hydrochar</text>
+    <text x="888" y="499" text-anchor="middle" font-size="7.2" fill="#fed7aa">Biochar</text>
+  </g>
+  <g class="node-group" data-tip="HTC process water analytics (composition and toxicity monitoring)">
+    <circle cx="905" cy="572" r="27" fill="#431407" stroke="#fb923c" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="905" y="569" text-anchor="middle" font-size="7.2" fill="#fed7aa" font-weight="600">Process</text>
+    <text x="905" y="579" text-anchor="middle" font-size="7.2" fill="#fed7aa">Water</text>
+  </g>
+  <g class="node-group" data-tip="HTC feedstocks: sewage sludge, green waste, manure, and co-substrate optimization; CO2 sequestration as negative emission technology">
+    <circle cx="858" cy="665" r="27" fill="#431407" stroke="#fb923c" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="858" y="662" text-anchor="middle" font-size="7.2" fill="#fed7aa" font-weight="600">Sewage Sludge</text>
+    <text x="858" y="672" text-anchor="middle" font-size="7.2" fill="#fed7aa">Green Waste</text>
+  </g>
+  <g class="node-group" data-tip="Bioremediation, nutrient availability, fertility improvement, removal of pollutants">
+    <circle cx="722" cy="672" r="27" fill="#431407" stroke="#fb923c" stroke-width="1.4" filter="url(#glow-sm)" class="node-circle"/>
+    <text x="722" y="669" text-anchor="middle" font-size="7.2" fill="#fed7aa" font-weight="600">Soil &amp; P</text>
+    <text x="722" y="679" text-anchor="middle" font-size="7.2" fill="#fed7aa">Mobilisation</text>
+  </g>
+
+  <!-- badges removed -->
+</svg>
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#38bdf8"></div>Chromatography &amp; Instrumental Analytics</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ff6eb4"></div>Nutrient Recovery N &amp; P</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#4ade80"></div>Environmental Analytics &amp; Micropollutants</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#c026d3"></div>Ecotoxicology &amp; Effect-Based Analytics</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#facc15"></div>Chemometrics &amp; AI / ML</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#fb923c"></div>HTC &amp; Circular Economy</div>
+</div>
+
+<div id="tooltip"></div>
+<footer>Network based on publications, ongoing research and analytical methods · ICB Hochschule Offenburg · May 2026</footer>
+
+<script>
+  const tooltip = document.getElementById('tooltip');
+  const clusterTips = {
+    center: 'Central research domain: Analytical Chemistry as cross-cutting discipline for Circular Bioeconomy, Environmental Protection and Process Monitoring.',
+    c1: 'LC · GC · IC · ICP-OES/TOC · HPTLC/EDA · IR · Instrumental infrastructure at ICB / HSO Offenburg',
+    c6: 'Struvite precipitation · P speciation · Wastewater treatment · N recovery',
+    c2: 'Removal of Pollutants · Phosphonates · PFAS, TFA · Xenobiotics · Antimicrobials & ARGs',
+    c4: 'Yeast and Bacteria · Enzymes · Cell Culture\nHPTLC-EDA as complementary planar bioassay approach',
+    c5: 'PCA · PLS-DA · OPLS-DA · Machine Learning · Database · Fingerprinting & Sequencing',
+    c3: 'HTC of municipal residuals (sewage sludge, green waste, manure)\nMass balance of educts and products for thermal and/or biotechnological processes',
+  };
+  const clusterLabels = {
+    center: 'Analytical Chemistry & Circular Bioeconomy',
+    c1: 'Chromatography & Instrumental Analytics',
+    c6: 'Nutrient Recovery N & P',
+    c2: 'Environmental Analytics & Micropollutants',
+    c4: 'Ecotoxicology & Effect-Based Analytics',
+    c5: 'Chemometrics & AI/ML',
+    c3: 'Hydrothermal Carbonization & Circular Economy',
+  };
+  document.querySelectorAll('.node-group').forEach(node => {
+    node.addEventListener('mouseenter', () => {
+      const key = node.dataset.tip;
+      const text = clusterTips[key] || key;
+      const label = clusterLabels[key] || '';
+      tooltip.innerHTML = label ? `<strong>${label}</strong>${text}` : text;
+      tooltip.style.opacity = '1';
+    });
+    node.addEventListener('mousemove', e => {
+      tooltip.style.left = (e.clientX + 14) + 'px';
+      tooltip.style.top  = (e.clientY - 10) + 'px';
+    });
+    node.addEventListener('mouseleave', () => { tooltip.style.opacity = '0'; });
+  });
+</script>
+</body>
+</html>
